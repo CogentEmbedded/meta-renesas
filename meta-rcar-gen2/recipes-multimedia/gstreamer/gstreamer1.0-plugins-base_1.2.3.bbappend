@@ -21,6 +21,7 @@ VSPFILTER_CONFIGS = " \
     file://gstvspfilter-lager.conf \
     file://gstvspfilter-porter.conf \
     file://gstvspfilter-silk.conf \
+    file://gstvspfilter-stout.conf \
 "
 
 # For wayland
