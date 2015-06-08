@@ -1,4 +1,4 @@
-From b1c38fdd23653c330edfef4a58b324c97ba84f99 Mon Sep 17 00:00:00 2001
+From 7de9e2457015029030fd15368e000f7115a81e0f Mon Sep 17 00:00:00 2001
 From: Vladimir Barinov <vladimir.barinov@cogentembedded.com>
 Date: Fri, 15 May 2015 19:25:14 +0300
 Subject: [PATCH] arm: rmobile: Add R8A7790-stout board support
@@ -37,7 +37,7 @@ index a1de751..5482be6 100644
  	r8a7793-gose.dtb \
 diff --git a/arch/arm/boot/dts/r8a7790-stout.dts b/arch/arm/boot/dts/r8a7790-stout.dts
 new file mode 100644
-index 0000000..4441333
+index 0000000..a4c70de
 --- /dev/null
 +++ b/arch/arm/boot/dts/r8a7790-stout.dts
 @@ -0,0 +1,643 @@
@@ -78,9 +78,9 @@ index 0000000..4441333
 +		reg = <0 0x40000000 0 0x40000000>;
 +	};
 +
-+	memory@140000000 {
++	memory@200000000 {
 +		device_type = "memory";
-+		reg = <1 0x40000000 0 0x40000000>;
++		reg = <2 0x00000000 0 0x40000000>;
 +	};
 +
 +	lbsc {
@@ -685,7 +685,7 @@ index 0000000..4441333
 +	status = "okay";
 +};
 diff --git a/arch/arm/configs/shmobile_defconfig b/arch/arm/configs/shmobile_defconfig
-index 85ad251..25aad88 100644
+index 85ad251..23f71d3 100644
 --- a/arch/arm/configs/shmobile_defconfig
 +++ b/arch/arm/configs/shmobile_defconfig
 @@ -25,6 +25,7 @@ CONFIG_MACH_LAGER=y
@@ -697,7 +697,7 @@ index 85ad251..25aad88 100644
  CONFIG_MACH_PORTER=y
  CONFIG_SHMOBILE_TIMER_HZ=100
 diff --git a/arch/arm/mach-shmobile/Kconfig b/arch/arm/mach-shmobile/Kconfig
-index 7c15245..93f08b1 100644
+index 7c15245..d9ecab9 100644
 --- a/arch/arm/mach-shmobile/Kconfig
 +++ b/arch/arm/mach-shmobile/Kconfig
 @@ -70,6 +70,11 @@ config MACH_LAGER
@@ -713,7 +713,7 @@ index 7c15245..93f08b1 100644
  	bool "Gose board"
  	depends on ARCH_R8A7793
 diff --git a/arch/arm/mach-shmobile/Makefile b/arch/arm/mach-shmobile/Makefile
-index 43b4025..4497984 100644
+index 43b4025..5705ed6 100644
 --- a/arch/arm/mach-shmobile/Makefile
 +++ b/arch/arm/mach-shmobile/Makefile
 @@ -74,6 +74,7 @@ ifdef CONFIG_ARCH_SHMOBILE_MULTI
@@ -726,7 +726,7 @@ index 43b4025..4497984 100644
  obj-$(CONFIG_MACH_SILK)		+= board-silk-reference.o
 diff --git a/arch/arm/mach-shmobile/board-r8a7790stout-reference.c b/arch/arm/mach-shmobile/board-r8a7790stout-reference.c
 new file mode 100644
-index 0000000..e0d344b
+index 0000000..3dc5805
 --- /dev/null
 +++ b/arch/arm/mach-shmobile/board-r8a7790stout-reference.c
 @@ -0,0 +1,731 @@
