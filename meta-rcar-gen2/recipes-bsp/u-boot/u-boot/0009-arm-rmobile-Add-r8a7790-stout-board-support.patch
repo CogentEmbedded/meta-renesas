@@ -91,7 +91,7 @@ new file mode 100644
 index 0000000..e6e14d4
 --- /dev/null
 +++ b/board/renesas/r8a7790stout/cpld.c
-@@ -0,0 +1,173 @@
+@@ -0,0 +1,179 @@
 +/*
 + * r8a7790-stout board FPGA access support
 + *
@@ -127,6 +127,7 @@ index 0000000..e6e14d4
 +#define CPLD_ADDR_MUX		0x01 /* RW */
 +#define CPLD_ADDR_HDMI		0x02 /* RW */
 +#define CPLD_ADDR_DIPSW		0x08 /* R */
++#define CPLD_ADDR_RESET		0x80 /* RW */
 +#define CPLD_ADDR_VERSION	0xFF /* R */
 +
 +static u32 cpld_read(u8 addr)
@@ -239,7 +240,7 @@ index 0000000..e6e14d4
 +	addr = simple_strtoul(argv[2], NULL, 16);
 +	if (!(addr == CPLD_ADDR_VERSION || addr == CPLD_ADDR_MODE ||
 +	      addr == CPLD_ADDR_MUX || addr == CPLD_ADDR_HDMI ||
-+	      addr == CPLD_ADDR_DIPSW)) {
++	      addr == CPLD_ADDR_DIPSW || addr == CPLD_ADDR_RESET)) {
 +		printf("cpld invalid addr\n");
 +		return CMD_RET_USAGE;
 +	}
@@ -265,6 +266,11 @@ index 0000000..e6e14d4
 +	"read addr\n"
 +	"cpld write addr val\n"
 +);
++
++void reset_cpu(ulong addr)
++{
++	cpld_write(CPLD_ADDR_RESET, 1);
++}
 diff --git a/board/renesas/r8a7790stout/cpld.h b/board/renesas/r8a7790stout/cpld.h
 new file mode 100644
 index 0000000..59688e6
@@ -468,7 +474,7 @@ new file mode 100644
 index 0000000..1b423af
 --- /dev/null
 +++ b/board/renesas/r8a7790stout/lowlevel_init.S
-@@ -0,0 +1,75 @@
+@@ -0,0 +1,81 @@
 +/*
 + * board/renesas/r8a7790stout/lowlevel_init.S
 + *     This file is r8a7790-stout board low level initialize.
@@ -532,6 +538,12 @@ index 0000000..1b423af
 +	orrne	r0, r0, #0x83			@ L2CTLR[7:6] + L2CTLR[2:0]
 +	orrne	r0, r0, #0x20			@ L2CTLR[5]
 +	mcrne	p15, 1, r0, c9, c0, 2
++
++	/* and set l2 auxiliary control */
++	mrcne p15, 1, r0, c15, c0, 0		@ r0 = L2ACTLR
++	orrne r0, r0, #(1<<3)			@ L2ACTLR[3]=1
++	mcrne p15, 1, r0, c15, c0, 0
++
 +_exit_init_l2_a15:
 +
 +	ldr	r3, =(CONFIG_SYS_INIT_SP_ADDR)
@@ -3045,7 +3057,7 @@ new file mode 100644
 index 0000000..bd0a34e
 --- /dev/null
 +++ b/board/renesas/r8a7790stout/r8a7790stout.c
-@@ -0,0 +1,345 @@
+@@ -0,0 +1,334 @@
 +/*
 + * board/renesas/r8a7790stout/r8a7790stout.c
 + *     This file is r8a7790-stout board support.
@@ -3319,17 +3331,6 @@ index 0000000..bd0a34e
 +	return ret;
 +}
 +
-+#define DA9063_I2C_ADDR		0x58
-+void reset_cpu(ulong addr)
-+{
-+	u8 val;
-+
-+	i2c_init(0, 0);
-+	i2c_read(DA9063_I2C_ADDR, 0x13, 1, &val, 1);
-+	val |= 0x02;
-+	i2c_write(DA9063_I2C_ADDR, 0x13, 1, &val, 1);
-+}
-+
 +enum {
 +	MSTP00, MSTP01, MSTP02, MSTP03, MSTP04, MSTP05,
 +	MSTP07, MSTP08, MSTP09, MSTP10, MSTP11,
@@ -3435,11 +3436,11 @@ index 78995b7..6e15a58 100644
  silk_media                   arm         armv7       silk                renesas        rmobile     silk:QOS_PRI_MEDIA
  silk_gfx                     arm         armv7       silk                renesas        rmobile     silk:QOS_PRI_GFX
  silk_vin                     arm         armv7       silk                renesas        rmobile     silk:QOS_PRI_VIN
-+r8a7790stout              arm         armv7       r8a7790stout     renesas        rmobile     r8a7790stout:QOS_PRI_NORMAL
-+r8a7790stout_extram       arm         armv7       r8a7790stout     renesas        rmobile     r8a7790stout:EXTRAM_BOOT,QOS_PRI_VIN
-+r8a7790stout_media        arm         armv7       r8a7790stout     renesas        rmobile     r8a7790stout:QOS_PRI_MEDIA
-+r8a7790stout_gfx          arm         armv7       r8a7790stout     renesas        rmobile     r8a7790stout:QOS_PRI_GFX
-+r8a7790stout_vin          arm         armv7       r8a7790stout     renesas        rmobile     r8a7790stout:QOS_PRI_VIN
++r8a7790stout                 arm         armv7       r8a7790stout        renesas        rmobile     r8a7790stout:QOS_PRI_NORMAL
++r8a7790stout_extram          arm         armv7       r8a7790stout        renesas        rmobile     r8a7790stout:EXTRAM_BOOT,QOS_PRI_VIN
++r8a7790stout_media           arm         armv7       r8a7790stout        renesas        rmobile     r8a7790stout:QOS_PRI_MEDIA
++r8a7790stout_gfx             arm         armv7       r8a7790stout        renesas        rmobile     r8a7790stout:QOS_PRI_GFX
++r8a7790stout_vin             arm         armv7       r8a7790stout        renesas        rmobile     r8a7790stout:QOS_PRI_VIN
  socfpga_cyclone5                arm         armv7          socfpga_cyclone5    altera		    socfpga
  actux1_4_16                  arm         ixp         actux1              -              -           actux1:FLASH2X2
  actux1_4_32                  arm         ixp         actux1              -              -           actux1:FLASH2X2,RAM_32MB
@@ -3492,7 +3493,7 @@ new file mode 100644
 index 0000000..8077361
 --- /dev/null
 +++ b/include/configs/r8a7790stout.h
-@@ -0,0 +1,204 @@
+@@ -0,0 +1,205 @@
 +/*
 + * include/configs/r8a7790stout.h
 + *     This file is r8a7790-stout board configuration.
@@ -3677,6 +3678,7 @@ index 0000000..8077361
 +/* FS */
 +#define CONFIG_DOS_PARTITION
 +#define CONFIG_SUPPORT_VFAT
++#define CONFIG_NFS_TIMEOUT	10000UL
 +
 +/* USB */
 +#define CONFIG_USB_STORAGE
