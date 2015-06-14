@@ -90,6 +90,7 @@ SRC_URI_append_lcb = " \
 	file://stout/07-r8a7790-stout/0006-usb-xhci-rcar-Change-RCar-Gen2-usb3-firmware-to-upstream-name.patch \
 	file://stout/07-r8a7790-stout/0007-xhci-rcar-add-firmware-for-R-Car-H2-M2-USB-3.0-host-.patch \
 	file://stout/07-r8a7790-stout/0008-spi-sh-msiof-request-gpios-for-cs-gpios.patch \
+	file://stout/07-r8a7790-stout/0009-sh-pfc-r8a7790-add-VIN0-1-_b-pins-support.patch \
 	file://stout/07-r8a7790-stout/0020-arm-rmobile-Add-R8A7790-stout-board-support.patch \
 "
 
