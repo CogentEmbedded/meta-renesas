@@ -91,6 +91,8 @@ SRC_URI_append_lcb = " \
 	file://stout/07-r8a7790-stout/0007-xhci-rcar-add-firmware-for-R-Car-H2-M2-USB-3.0-host-.patch \
 	file://stout/07-r8a7790-stout/0008-spi-sh-msiof-request-gpios-for-cs-gpios.patch \
 	file://stout/07-r8a7790-stout/0009-sh-pfc-r8a7790-add-VIN0-1-_b-pins-support.patch \
+	file://stout/07-r8a7790-stout/0010-media-i2c-soc_camera-Add-ov10635-sensor-driver.patch \
+	file://stout/07-r8a7790-stout/0011-media-soc_camera-add-10bit-format-for-rcar_vin.patch \
 	file://stout/07-r8a7790-stout/0020-arm-rmobile-Add-R8A7790-stout-board-support.patch \
 "
 

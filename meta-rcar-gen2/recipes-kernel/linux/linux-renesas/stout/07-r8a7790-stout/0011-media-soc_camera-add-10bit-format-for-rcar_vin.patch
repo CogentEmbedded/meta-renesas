@@ -1,0 +1,113 @@
+From c4348544a2b8360cfd50a1568a5b6d77dc8fd5d6 Mon Sep 17 00:00:00 2001
+From: Vladimir Barinov <vladimir.barinov@cogentembedded.com>
+Date: Tue, 23 Jun 2015 14:46:29 +0300
+Subject: [PATCH] media: soc_camera: add 10bit format for rcar_vin
+
+Add 10bit format to RCAR VIN
+
+Signed-off-by: Vladimir Barinov <vladimir.barinov@cogentembedded.com>
+---
+ drivers/media/platform/soc_camera/rcar_vin.c     |  9 +++++++++
+ drivers/media/platform/soc_camera/soc_mediabus.c | 16 ++++++++++++++++
+ include/media/soc_mediabus.h                     |  3 +++
+ 3 files changed, 28 insertions(+)
+
+diff --git a/drivers/media/platform/soc_camera/rcar_vin.c b/drivers/media/platform/soc_camera/rcar_vin.c
+index 5435fd2..fe8f64b 100644
+--- a/drivers/media/platform/soc_camera/rcar_vin.c
++++ b/drivers/media/platform/soc_camera/rcar_vin.c
+@@ -91,6 +91,8 @@
+ #define VNMC_YCAL		(1 << 19)
+ #define VNMC_INF_YUV8_BT656	(0 << 16)
+ #define VNMC_INF_YUV8_BT601	(1 << 16)
++#define VNMC_INF_YUV10_BT656	(2 << 16)
++#define VNMC_INF_YUV10_BT601	(3 << 16)
+ #define VNMC_INF_YUV16		(5 << 16)
+ #define VNMC_INF_RGB888		(6 << 16)
+ #define VNMC_INF_MASK		(7 << 16)
+@@ -630,6 +632,12 @@ static int rcar_vin_setup(struct rcar_vin_priv *priv)
+ 		/* BT.656 8bit YCbCr422 or BT.601 8bit YCbCr422 */
+ 		vnmc |= priv->pdata->flags & RCAR_VIN_BT656 ?
+ 			VNMC_INF_YUV8_BT656 : VNMC_INF_YUV8_BT601;
++		break;
++	case V4L2_MBUS_FMT_YUYV10_2X10:
++		/* BT.656 10bit YCbCr422 or BT.601 10bit YCbCr422 */
++		vnmc |= priv->pdata->flags & RCAR_VIN_BT656 ?
++			VNMC_INF_YUV10_BT656 : VNMC_INF_YUV10_BT601;
++		break;
+ 	default:
+ 		break;
+ 	}
+@@ -1471,6 +1479,7 @@ static int rcar_vin_get_formats(struct soc_camera_device *icd, unsigned int idx,
+ 	switch (code) {
+ 	case V4L2_MBUS_FMT_YUYV8_1X16:
+ 	case V4L2_MBUS_FMT_YUYV8_2X8:
++	case V4L2_MBUS_FMT_YUYV10_2X10:
+ 	case V4L2_MBUS_FMT_RGB888_1X24:
+ 		if (cam->extra_fmt)
+ 			break;
+diff --git a/drivers/media/platform/soc_camera/soc_mediabus.c b/drivers/media/platform/soc_camera/soc_mediabus.c
+index dc02dec..ca2ae7a 100644
+--- a/drivers/media/platform/soc_camera/soc_mediabus.c
++++ b/drivers/media/platform/soc_camera/soc_mediabus.c
+@@ -57,6 +57,16 @@ static const struct soc_mbus_lookup mbus_fmt[] = {
+ 		.layout			= SOC_MBUS_LAYOUT_PACKED,
+ 	},
+ }, {
++	.code = V4L2_MBUS_FMT_YUYV10_2X10,
++	.fmt = {
++		.fourcc			= V4L2_PIX_FMT_YUYV,
++		.name			= "YUYV",
++		.bits_per_sample	= 10,
++		.packing		= SOC_MBUS_PACKING_2X10_PADHI,
++		.order			= SOC_MBUS_ORDER_LE,
++		.layout			= SOC_MBUS_LAYOUT_PACKED,
++	},
++}, {
+ 	.code = V4L2_MBUS_FMT_RGB555_2X8_PADHI_LE,
+ 	.fmt = {
+ 		.fourcc			= V4L2_PIX_FMT_RGB555,
+@@ -403,6 +413,10 @@ int soc_mbus_samples_per_pixel(const struct soc_mbus_pixelfmt *mf,
+ 		*numerator = 2;
+ 		*denominator = 1;
+ 		return 0;
++	case SOC_MBUS_PACKING_2X10_PADHI:
++		*numerator = 3;
++		*denominator = 1;
++		return 0;
+ 	case SOC_MBUS_PACKING_1_5X8:
+ 		*numerator = 3;
+ 		*denominator = 2;
+@@ -428,6 +442,8 @@ s32 soc_mbus_bytes_per_line(u32 width, const struct soc_mbus_pixelfmt *mf)
+ 	case SOC_MBUS_PACKING_2X8_PADLO:
+ 	case SOC_MBUS_PACKING_EXTEND16:
+ 		return width * 2;
++	case SOC_MBUS_PACKING_2X10_PADHI:
++		return width * 3;
+ 	case SOC_MBUS_PACKING_1_5X8:
+ 		return width * 3 / 2;
+ 	case SOC_MBUS_PACKING_VARIABLE:
+diff --git a/include/media/soc_mediabus.h b/include/media/soc_mediabus.h
+index d33f6d0..1c89b18 100644
+--- a/include/media/soc_mediabus.h
++++ b/include/media/soc_mediabus.h
+@@ -21,6 +21,8 @@
+  * @SOC_MBUS_PACKING_2X8_PADHI:	16 bits transferred in 2 8-bit samples, in the
+  *				possibly incomplete byte high bits are padding
+  * @SOC_MBUS_PACKING_2X8_PADLO:	as above, but low bits are padding
++ * @SOC_MBUS_PACKING_2X10_PADHI:20 bits transferred in 2 10-bit samples. The
++ *                              high bits are padding
+  * @SOC_MBUS_PACKING_EXTEND16:	sample width (e.g., 10 bits) has to be extended
+  *				to 16 bits
+  * @SOC_MBUS_PACKING_VARIABLE:	compressed formats with variable packing
+@@ -33,6 +35,7 @@ enum soc_mbus_packing {
+ 	SOC_MBUS_PACKING_NONE,
+ 	SOC_MBUS_PACKING_2X8_PADHI,
+ 	SOC_MBUS_PACKING_2X8_PADLO,
++	SOC_MBUS_PACKING_2X10_PADHI,
+ 	SOC_MBUS_PACKING_EXTEND16,
+ 	SOC_MBUS_PACKING_VARIABLE,
+ 	SOC_MBUS_PACKING_1_5X8,
+-- 
+1.9.1
+

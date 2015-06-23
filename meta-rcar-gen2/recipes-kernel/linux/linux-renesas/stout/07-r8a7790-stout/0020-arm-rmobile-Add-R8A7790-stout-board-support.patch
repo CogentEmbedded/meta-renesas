@@ -392,7 +392,7 @@ index 0000000..43054eb
 +	};
 +
 +	vin0_bt601_pins: vin0_sync {
-+		renesas,groups = "vin0_b_data8", "vin0_sync_b", "vin0_clk_b";
++		renesas,groups = "vin0_b_data10", "vin0_sync_b", "vin0_clk_b";
 +		renesas,function = "vin0";
 +	};
 +
@@ -402,7 +402,7 @@ index 0000000..43054eb
 +	};
 +
 +	vin1_bt601_pins: vin1_sync {
-+		renesas,groups = "vin1_b_data8", "vin1_sync_b", "vin1_clk_b";
++		renesas,groups = "vin1_b_data10", "vin1_sync_b", "vin1_clk_b";
 +		renesas,function = "vin1";
 +	};
 +
@@ -1342,8 +1342,8 @@ index 0000000..1115e99
 +
 +R8A7790stout_CAMERA(0, "ov10635", 2, 0x30, NULL, RCAR_VIN_BT656);
 +R8A7790stout_CAMERA(1, "ov10635", 1, 0x30, NULL, RCAR_VIN_BT656);
-+R8A7790stout_CAMERA(2, "ov10635", 2, 0x30, NULL, RCAR_VIN_BT656);
-+R8A7790stout_CAMERA(3, "ov10635", 1, 0x30, NULL, RCAR_VIN_BT656);
++R8A7790stout_CAMERA(2, "ov10635", 2, 0x31, NULL, RCAR_VIN_BT656);
++R8A7790stout_CAMERA(3, "ov10635", 1, 0x31, NULL, RCAR_VIN_BT656);
 +
 +static void __init r8a7790stout_add_camera0_device(void)
 +{
@@ -2131,7 +2131,7 @@ new file mode 100644
 index 0000000..6d2ecd3
 --- /dev/null
 +++ b/drivers/pinctrl/pinmux-cpld.c
-@@ -0,0 +1,275 @@
+@@ -0,0 +1,276 @@
 +/*
 + * r8a7790-stout board CPLD MUX driver
 + *
@@ -2234,6 +2234,7 @@ index 0000000..6d2ecd3
 +				priv->states_current = i;
 +				dev_info(dev, "setup cpldmux state %s\n",
 +					 priv->pinctrl_states[i]);
++				break;
 +			}
 +		}
 +	}
