@@ -256,7 +256,7 @@ index 0000000..43054eb
 +		pinctrl-1 = <&vin1_bt601_pins>;
 +		pinctrl-2 = <&sdhi0_pins &i2c1_pins>;
 +
-+		cpldmux-0 = <0x801 0x800>; /* mask val */
++		cpldmux-0 = <0x861 0x860>; /* mask val */
 +		cpldmux-1 = <0x821 0x800>;
 +		cpldmux-2 = <0x861 0x60>;
 +	};
@@ -265,7 +265,7 @@ index 0000000..43054eb
 +		compatible = "pinmux-cpld";
 +		pinctrl-names = "vin2_bt656_state", "vin2_bt601_state", "avb_state";
 +		pinctrl-0 = <&vin2_bt656_pins &scifa0_pins>;
-+		pinctrl-1 = <&vin2_bt656_pins>;
++		pinctrl-1 = <&vin2_bt601_pins>;
 +		pinctrl-2 = <&avb_pins &scifa0_pins>;
 +
 +		cpldmux-0 = <0x4087 0x4006>; /* mask val */
@@ -806,7 +806,7 @@ new file mode 100644
 index 0000000..1115e99
 --- /dev/null
 +++ b/arch/arm/mach-shmobile/board-r8a7790stout-reference.c
-@@ -0,0 +1,763 @@
+@@ -0,0 +1,755 @@
 +/*
 + * R8A7790-stout board support - Reference DT implementation
 + *
@@ -984,12 +984,10 @@ index 0000000..1115e99
 +	{ "lvds0", "lvds.0", "rcar-du-r8a7790" },
 +	{ "lvds1", "lvds.1", "rcar-du-r8a7790" },
 +	{ "hsusb", NULL, "usb_phy_rcar_gen2" },
-+#if !IS_ENABLED(CONFIG_RAVB)
 +	{ "vin0", NULL, "r8a7790-vin.0" },
 +	{ "vin1", NULL, "r8a7790-vin.1" },
 +	{ "vin2", NULL, "r8a7790-vin.2" },
 +	{ "vin3", NULL, "r8a7790-vin.3" },
-+#endif
 +	{ "vspr", NULL, NULL },
 +	{ "vsps", NULL, NULL },
 +#if IS_ENABLED(CONFIG_VIDEO_RENESAS_VSP1) && \
@@ -1016,9 +1014,7 @@ index 0000000..1115e99
 + * This is a really crude hack to work around core platform clock issues
 + */
 +static const struct clk_name clk_enables[] __initconst = {
-+#if IS_ENABLED(CONFIG_RAVB)
 +	{ "avb", NULL, "e6800000.ethernet" },
-+#endif
 +	{ "ehci", NULL, "pci-rcar-gen2.1" },
 +	{ "ehci", NULL, "pci-rcar-gen2.2" },
 +	{ "dmal", NULL, "sh-dma-engine.0" },
@@ -1281,7 +1277,6 @@ index 0000000..1115e99
 +};
 +#endif
 +
-+#if !IS_ENABLED(CONFIG_RAVB)
 +/* VIN */
 +static const struct resource vin_resources[] __initconst = {
 +	/* VIN0 */
@@ -1372,7 +1367,6 @@ index 0000000..1115e99
 +				      &cam3_link, sizeof(cam3_link));
 +	r8a7790stout_add_vin_device(3, &vin3_pdata);
 +}
-+#endif
 +
 +/* VSP1 */
 +#if IS_ENABLED(CONFIG_VIDEO_RENESAS_VSP1) && \
@@ -1538,12 +1532,10 @@ index 0000000..1115e99
 +	r8a7790stout_add_usb2_device();
 +#endif
 +
-+#if !IS_ENABLED(CONFIG_RAVB)
 +	r8a7790stout_add_camera0_device();
 +	r8a7790stout_add_camera1_device();
 +	r8a7790stout_add_camera2_device();
 +	r8a7790stout_add_camera3_device();
-+#endif
 +
 +#if IS_ENABLED(CONFIG_VIDEO_RENESAS_VSP1) && \
 +!defined(CONFIG_DRM_RCAR_DU_CONNECT_VSP)
