@@ -39,6 +39,7 @@ SRC_URI_append_lcb = " \
 	file://0014-ARM-shmobile-defconfig-Enable-SCI-DMA-support.patch \
 	file://0015-ARM-shmobile-defconfig-Enable-Bluetooth.patch \
 	file://0016-ARM-shmobile-defconfig-Add-ATAG-DTB-compatibility.patch \
+	file://0017-tty-serial-sh-sci-protect-SCSCR-register-access.patch \
 	\
 	file://stout/01-da9063_rtc/0001-rtc-da9063-RTC-driver.patch \
 	file://stout/02-da9063_mfd/0001-mfd-da9063-Add-IRQ-support.patch \
