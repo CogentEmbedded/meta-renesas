@@ -91,7 +91,7 @@ new file mode 100644
 index 0000000..e6e14d4
 --- /dev/null
 +++ b/board/renesas/r8a7790stout/cpld.c
-@@ -0,0 +1,179 @@
+@@ -0,0 +1,181 @@
 +/*
 + * r8a7790-stout board FPGA access support
 + *
@@ -222,11 +222,13 @@ index 0000000..e6e14d4
 +	val |= MUX_VAL_SD0;
 +	cpld_write(CPLD_ADDR_MUX, val);
 +
++#if 0
 +	/* switch MUX to SD2 */
 +	val = cpld_read(CPLD_ADDR_MUX);
 +	val &= ~MUX_MSK_SD2;
 +	val |= MUX_VAL_SD2;
 +	cpld_write(CPLD_ADDR_MUX, val);
++#endif
 +#endif
 +}
 +
